@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RecoverAI — Revenue Recovery Control Plane</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div><div class="brand-name">RecoverAI</div><div class="brand-sub">Revenue recovery control plane</div></div>
+    </div>
+    <div class="nav-label">COMMAND CENTER</div>
+    <nav>
+      <button class="nav active" data-view="overview"><span>01</span>Overview</button>
+      <button class="nav" data-view="opportunities"><span>02</span>Revenue queue</button>
+      <button class="nav" data-view="demo"><span>03</span>Live demo</button>
+      <button class="nav" data-view="impact"><span>04</span>Impact lab</button>
+      <button class="nav" data-view="insights"><span>05</span>Revenue insights</button>
+      <button class="nav" data-view="playbooks"><span>06</span>Playbooks</button>
+      <button class="nav" data-view="audit"><span>07</span>Decision trace</button>
+      <button class="nav" data-view="controls"><span>08</span>Guardrails</button>
+    </nav>
+    <div class="side-bottom">
+      <span class="live-dot"></span>
+      <div><div class="micro">EXECUTION MODE</div><div class="mode" id="modeText">Local deterministic simulator</div></div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div><div class="eyebrow">MERCHANT CONSOLE / RECOVERAI</div><h1 id="pageTitle">Overview</h1></div>
+      <div class="top-actions"><span class="health"><i></i> system healthy</span><button class="icon-btn" id="resetBtn" title="Reset demo data">↻</button><div class="avatar">M</div></div>
+    </header>
+    <section id="content"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><div class="eyebrow">OPPORTUNITY REVIEW</div><h2 id="modalTitle">Recovery case</h2></div><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
+<script src="/static/app.js"></script>
+</body></html>

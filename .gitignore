@@ -8,3 +8,4 @@ models/*.json
 .env
 .DS_Store
 .venv/
+overview.png

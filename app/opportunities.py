@@ -228,7 +228,7 @@ def decision_trace(op: dict):
       {'step':'PREDICT','label':'Recovery probability','detail':f"{op['recovery_score']*100:.1f}% estimated recoverability; expected net value ₹{max(0,op['expected_value']):,.0f}",'status':'done'},
       {'step':'PLAN','label':'Best intervention','detail':f"{action.replace('_',' ')} · {play[1] if play else 'Bounded playbook selected.'}",'status':'done'},
       {'step':'COUNTERFACTUAL','label':'Alternatives considered','detail':_counterfactual_text(op),'status':'done'},
-      {'step':'GATE','label':'Merchant policy','detail':'Allowed · '+reasons[0] if allowed else 'Blocked · '+reasons[0],'status':'passed' if allowed else 'blocked'},
+      {'step':'GATE','label':'Merchant policy','detail':('Allowed · ' + (reasons[0] if reasons else 'within configured limits')) if allowed else ('Blocked · ' + (reasons[0] if reasons else 'policy restriction')), 'status':'passed' if allowed else 'blocked'},
       {'step':'EXECUTE','label':'Tool execution','detail':'Ready to execute one bounded action; outcome becomes part of the audit record.','status':'ready'},
     ]
 
@@ -286,7 +286,20 @@ def execute(op_id: str, force_action: str|None=None):
     exec_sql('INSERT INTO recovery_outcomes(opportunity_id,action,expected_value,actual_value,success,tool_result,created_at) VALUES(?,?,?,?,?,?,?)',(op_id,action,op['expected_value'],actual,int(success),json.dumps(result),now))
     new_status=status if status in ('recovered','failed') else status
     exec_sql('UPDATE recovery_opportunities SET recommended_action=?,status=?,outcome=?,updated_at=? WHERE id=?',(action,new_status,json.dumps(result),now,op_id))
-    exec_sql('INSERT INTO agent_actions(payment_id,action,reason,confidence,policy_result,api_result,success,created_at) VALUES(?,?,?,?,?,?,?,?)',(op.get('payment_id') or '',action,f"{op['reason_code']} · {op['kind']}",op['recovery_score'],'PASSED',json.dumps(result),int(success),now))
+    if op.get('payment_id'):
+        exec_sql(
+            'INSERT INTO agent_actions(payment_id,action,reason,confidence,policy_result,api_result,success,created_at) VALUES(?,?,?,?,?,?,?,?)',
+            (
+                op['payment_id'],
+                action,
+                f"{op['reason_code']} · {op['kind']}",
+                op['recovery_score'],
+                'PASSED',
+                json.dumps(result),
+                int(success),
+                now
+            )
+        )
     exec_sql('INSERT INTO audit_logs(payment_id,event,details,created_at) VALUES(?,?,?,?)',(op.get('payment_id') or '', 'ACTION_EXECUTED', json.dumps({'opportunity_id':op_id,'kind':op['kind'],'amount':op['amount'],'action':action,'result':result}),now))
     if success:
         exec_sql('INSERT INTO playbook_results(playbook,action,attempts,successes,recovered_value,updated_at) VALUES(?,?,?,?,?,?)',(op['reason_code'],action,1,1,actual,now))
